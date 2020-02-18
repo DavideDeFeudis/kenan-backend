@@ -1,14 +1,10 @@
 const express = require('express')
-const { body, validationResult } = require("express-validator")
 const app = express()
 const sendMail = require('./mail')
 const mongoose = require('mongoose')
-const bcrypt = require("bcrypt")
-const jwt = require("jsonwebtoken")
 require('dotenv').config()
 
 const port = process.env.PORT || 4000
-const secret = process.env.SECRET
 const mongoUrl = process.env.MONGO
 
 mongoose.connect(mongoUrl, {
@@ -27,11 +23,6 @@ mongoose.connect(mongoUrl, {
 const adminSchema = new mongoose.Schema({
     email: { type: String, required: true },
     password: { type: String, required: true },
-})
-
-// hide password and version field
-adminSchema.set("toJSON", {
-    transform: (doc, { password, __v, ...publicFields }, options) => publicFields
 })
 
 const Admin = mongoose.model('Admin', adminSchema);
@@ -224,138 +215,6 @@ app.delete("/admin/workshop/:id", async (req, res) => {
     } catch (err) {
         res.send(err)
     }
-})
-
-
-// MIDDLEWARE FOR VALIDATING INPUTS
-app.post('/admin/signup',
-    body('email')
-        .notEmpty().withMessage("Email not present")
-        .bail()
-        .isEmail().withMessage("Invalid email format")
-        .normalizeEmail(),
-    body('password')
-        .notEmpty().withMessage("Password not present")
-        .bail()
-        .isLength({ min: 8 }).withMessage("Password must have min 8 characters"),
-    (req, res, next) => {
-        const errors = validationResult(req)
-
-        if (!errors.isEmpty()) {
-            return res.status(400).send(errors.array())
-        }
-        next()
-    })
-
-// Hash the PW & create an admin in the DB
-app.post('/admin/signup', (req, res) => {
-    // check if an admin with this email already exists
-    Admin.findOne({ email: req.body.email }).then(admin => {
-        if (!admin) {
-            Admin.create({
-                email: req.body.email,
-                // hash the given password before saving it to the DB
-                password: bcrypt.hashSync(req.body.password, 10),
-            })
-                // return the created admin
-                .then(newAdmin => {
-                    return res.send(newAdmin)
-                })
-        }
-        else {
-            res.status(400).send({
-                error: "Admin with this email already exists"
-            })
-        }
-    })
-        .catch(err => next(err))
-});
-
-// app.post('/admin/signup', (req, res) => {
-//     console.log(req.body)
-//     res.send('admin saved')
-//     const { email, password } = req.body
-//     const admin = new Admin({
-//         email,
-//         password
-//     })
-//     admin.save()
-//         .then(() => res.send('admin saved'))
-//         .catch(err => console.log(err))
-// })
-
-
-
-/////////////////////////////////////////////
-// LOGIN
-/////////////////////////////////////////////
-
-// LOGIN MIDDLEWARE FOR VALIDATING INPUTS
-app.post('/admin/login',
-    body('email').notEmpty().withMessage("Email not present").normalizeEmail(),
-    body('password').notEmpty().withMessage("Password not present"),
-
-    (req, res, next) => {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            return res.status(400).send(errors.array())
-        }
-        next()
-    })
-
-app.post('/admin/login', (req, res, next) => {
-    Admin.findOne({ email: req.body.email }).then(admin => {
-        // admin with this email not found? => error
-        if (!admin) {
-            return next('Authentication fail: wrong email')
-        }
-        // compare passwords using bcrypt.compare()
-        bcrypt.compare(req.body.password, admin.password)
-            .then(success => {
-                // admin password does not match password from login form? => error
-                if (!success) {
-                    return next('Authentication fail: wrong password')
-                }
-                // create JWT token by signing
-                let token = jwt.sign(
-                    { id: admin.id, email: admin.email }, // what data to sign
-                    secret, // signing key
-                    { expiresIn: "1h" } // expiry time
-                )
-                res.send({ token })
-            })
-    })
-        .catch(err => next(err))
-})
-
-
-
-/////////////////////////////////////////////
-// ADMIN
-/////////////////////////////////////////////
-
-// AUTHORIZATION MIDDLEWARE
-app.get('/admin', (req, res, next) => {
-    let tokenHeader = req.headers.authorization
-    // another way: req.header("Authorization")
-    if (!tokenHeader) {
-        return next("Authorization failed - Token missing")
-    }
-    // verify the token
-    try {
-        let token = tokenHeader.split(" ")[1]
-        let adminData = jwt.verify(token, secret)
-        req.admin = adminData
-        next() // allow access to secured route
-    }
-    catch (err) {
-        res.send({ jwtError: err.message })
-    }
-})
-
-app.get('/admin', (req, res) => {
-    // redirect to admin page
-    res.send('authorized to admin page')
 })
 
 // ERROR HANDLER
