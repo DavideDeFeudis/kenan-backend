@@ -20,14 +20,14 @@ mongoose.connect(mongoUrl, {
     }
 });
 
-const adminSchema = new mongoose.Schema({
-    email: { type: String, required: true },
-    password: { type: String, required: true },
-})
+// const adminSchema = new mongoose.Schema({
+//     email: { type: String, required: true },
+//     password: { type: String, required: true },
+// })
 
-const Admin = mongoose.model('Admin', adminSchema);
+// const Admin = mongoose.model('Admin', adminSchema);
 
-const Customer = mongoose.model('Customer', new mongoose.Schema({
+const CustomerSchema = new mongoose.Schema({
     email: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -38,9 +38,11 @@ const Customer = mongoose.model('Customer', new mongoose.Schema({
     //     type: mongoose.Schema.Types.ObjectId,
     //     ref: 'Workshop'
     // }]
-}));
+})
 
-const Workshop = mongoose.model('Workshop', new mongoose.Schema({
+// const Customer = mongoose.model('Customer', CustomerSchema);
+
+const WorkshopSchema = new mongoose.Schema({
     secondaryID: { type: String, required: true },
     title: { type: String, required: true },
     date: { type: String, required: true },
@@ -58,11 +60,14 @@ const Workshop = mongoose.model('Workshop', new mongoose.Schema({
     price4: Number,
     price5: Number,
     price6: Number,
-    customers: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Customer'
-    }]
-}));
+    customers: [CustomerSchema]
+    // customers: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Customer'
+    // }]
+})
+
+const Workshop = mongoose.model('Workshop', WorkshopSchema);
 
 app.use(express.json())
 
@@ -92,7 +97,7 @@ app.post('/contact', (req, res) => {
 
 app.post('/workshops', (req, res) => {
     let { email, firstName, lastName, subject, text } = req.body
-    
+
     const customer = new Customer({ email, firstName, lastName, subject, text })
 
     const name = `${firstName} ${lastName}`
@@ -135,6 +140,19 @@ app.get('/seed', (req, res) => {
         price2: 50,
         price3: 100,
         price4: 60,
+        customers: [{
+            email: 'customer1@gmail.com',
+            firstName: 'jo',
+            lastName: 'doe',
+            subject: 'Sign up for workshop',
+            text: 'hi, i want to sign up'
+        }, {
+            email: 'customer2@gmail.com',
+            firstName: 'al',
+            lastName: 'nap',
+            subject: 'Sign up for workshop 2',
+            text: 'i want to sign up'
+        }]
     })
     const workshop2 = new Workshop({
         secondaryID: 'srt4565rgkjhw45kjh',
@@ -150,6 +168,13 @@ app.get('/seed', (req, res) => {
         price2: 50,
         price3: 100,
         price4: 60,
+        customers: [{
+            email: 'customer1@gmail.com',
+            firstName: 'jo',
+            lastName: 'doe',
+            subject: 'Sign up for workshop',
+            text: 'hi, i want to sign up'
+        }]
     })
     const workshop3 = new Workshop({
         secondaryID: 'sfgkjsrtgkjkj5439fdf',
@@ -165,6 +190,7 @@ app.get('/seed', (req, res) => {
         price2: 40,
         price3: 90,
         price4: 50,
+        customers: []
     })
     Workshop.insertMany([workshop1, workshop2, workshop3])
         .then(() => res.send([workshop1, workshop2, workshop3]))
