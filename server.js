@@ -28,14 +28,16 @@ const adminSchema = new mongoose.Schema({
 const Admin = mongoose.model('Admin', adminSchema);
 
 const Customer = mongoose.model('Customer', new mongoose.Schema({
+    email: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true },
-    messages: [{ subject: String, text: String }],
-    workshops: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Workshop'
-    }]
+    subject: { type: String, required: true },
+    text: { type: String, required: false }
+    // messages: [{ subject: String, text: String }],
+    // workshops: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Workshop'
+    // }]
 }));
 
 const Workshop = mongoose.model('Workshop', new mongoose.Schema({
@@ -90,6 +92,9 @@ app.post('/contact', (req, res) => {
 
 app.post('/workshops', (req, res) => {
     let { email, firstName, lastName, subject, text } = req.body
+    
+    const customer = new Customer({ email, firstName, lastName, subject, text })
+
     const name = `${firstName} ${lastName}`
     if (!text) {
         text = `From: ${name} ${email}`
@@ -99,6 +104,13 @@ app.post('/workshops', (req, res) => {
             res.status(500).json({ message: 'Error signing up. Try again later.' })
         }
         else {
+
+            //////////////////////// i want success mgs even if db failed or viceversa
+            customer.save()
+                .then(() => res.json({ message: 'Customer saved' }))
+                .catch(err => res.send(err))
+            ////////////////////////
+
             res.json({ message: 'You signed up successfully!' })
         }
     })
@@ -161,7 +173,7 @@ app.get('/seed', (req, res) => {
 
 app.get('/drop', (req, res) => {
     Workshop.collection.drop()
-        .then(() => res.send({ message: 'collection dropped'}))
+        .then(() => res.send({ message: 'collection dropped' }))
         .catch(err => res.send(err))
 })
 
