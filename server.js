@@ -194,6 +194,23 @@ app.get('/workshops', (req, res) => {
     // })
 })
 
+app.get('/customers', (req, res) => {
+    Customer.find()
+        .then(customers => res.send(customers))
+        .catch(err => {
+            res.send(err)
+        })
+    // Workshop.find((err, workshops) => {
+    //     if (err) {
+    //         console.log(err)
+    //         res.send(err)
+    //     } else {
+    //         mongoose.connection.close();
+    //         res.send(workshops)
+    //     }
+    // })
+})
+
 app.post('/admin/workshop', (req, res) => {
     const {
         secondaryID,
