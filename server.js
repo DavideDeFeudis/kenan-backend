@@ -20,14 +20,8 @@ mongoose.connect(mongoUrl, {
     }
 });
 
-// const adminSchema = new mongoose.Schema({
-//     email: { type: String, required: true },
-//     password: { type: String, required: true },
-// })
-
-// const Admin = mongoose.model('Admin', adminSchema);
-
 const CustomerSchema = new mongoose.Schema({
+    workshopId: { type: String, required: false },
     email: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -40,7 +34,7 @@ const CustomerSchema = new mongoose.Schema({
     // }]
 })
 
-// const Customer = mongoose.model('Customer', CustomerSchema);
+const Customer = mongoose.model('Customer', CustomerSchema);
 
 const WorkshopSchema = new mongoose.Schema({
     secondaryID: { type: String, required: true },
@@ -96,29 +90,39 @@ app.post('/contact', (req, res) => {
 })
 
 app.post('/workshops', (req, res) => {
-    let { email, firstName, lastName, subject, text } = req.body
+    let { workshopId, email, firstName, lastName, subject, text } = req.body
 
-    const customer = new Customer({ email, firstName, lastName, subject, text })
+    // ADD CUSTOMER TO CUSTOMERS COLLECTION
+    // const customer = new Customer({ workshopId, email, firstName, lastName, subject, text })
+    // customer.save()
+    //     .then(() => res.json({ message: 'Customer saved' }))
+    //     .catch(err => res.send(err))
 
-    const name = `${firstName} ${lastName}`
-    if (!text) {
-        text = `From: ${name} ${email}`
-    }
-    sendMail(email, name, subject, text, (err, data) => {
+    // ADD CUSTOMER TO WORKSHOP CUSTOMERS ARRAY
+    Workshop.findById(workshopId, (err, workshop) => {
         if (err) {
-            res.status(500).json({ message: 'Error signing up. Try again later.' })
-        }
-        else {
-
-            //////////////////////// i want success mgs even if db failed or viceversa
-            customer.save()
-                .then(() => res.json({ message: 'Customer saved' }))
-                .catch(err => res.send(err))
-            ////////////////////////
-
-            res.json({ message: 'You signed up successfully!' })
+            console.log('findById err:', err)
+            res.json({ message: 'error finding workshop' })
+        } else {
+            console.log('found workshop:', workshop)
+            res.json({ message: 'found workshop' })
         }
     })
+
+
+    // SEND EMAIL
+    // const name = `${firstName} ${lastName}`
+    // if (!text) {
+    //     text = `From: ${name} ${email}`
+    // }
+    // sendMail(email, name, subject, text, (err, data) => {
+    //     if (err) {
+    //         res.status(500).json({ message: 'Error signing up. Try again later.' })
+    //     }
+    //     else {
+    //         res.json({ message: 'You signed up successfully!' })
+    //     }
+    // })
 })
 
 app.get('/seed', (req, res) => {
