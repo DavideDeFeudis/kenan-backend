@@ -93,21 +93,30 @@ app.post('/workshops', (req, res) => {
     let { workshopId, email, firstName, lastName, subject, text } = req.body
 
     // ADD CUSTOMER TO CUSTOMERS COLLECTION
-    // const customer = new Customer({ workshopId, email, firstName, lastName, subject, text })
+    const customer = new Customer({ workshopId, email, firstName, lastName, subject, text })
     // customer.save()
     //     .then(() => res.json({ message: 'Customer saved' }))
     //     .catch(err => res.send(err))
 
     // ADD CUSTOMER TO WORKSHOP CUSTOMERS ARRAY
-    Workshop.findById(workshopId, (err, workshop) => {
-        if (err) {
-            console.log('findById err:', err)
-            res.json({ message: 'error finding workshop' })
-        } else {
-            console.log('found workshop:', workshop)
-            res.json({ message: 'found workshop' })
-        }
-    })
+    Workshop.findById(workshopId)
+        .then((workshop) => {
+            workshop.customers.push(customer)
+            workshop.save()
+            res.json({ message: 'customer added in ws: ' + workshop.title })
+        })
+        .catch(() => res.json({ message: 'error adding customer' }))
+    // need to catch err finding ws and err pushing customer?
+
+    // Workshop.findById(workshopId, (err, workshop) => {
+    //     if (err) {
+    //         console.log('findById err:', err)
+    //         res.json({ message: 'error finding workshop' })
+    //     } else {
+    //         console.log('found workshop:', workshop)
+    //         res.json({ message: 'found workshop' })
+    //     }
+    // })
 
 
     // SEND EMAIL
@@ -146,14 +155,14 @@ app.get('/seed', (req, res) => {
         price4: 60,
         customers: [{
             email: 'customer1@gmail.com',
-            firstName: 'jo',
-            lastName: 'doe',
+            firstName: 'Jo',
+            lastName: 'Doe',
             subject: 'Sign up for workshop',
             text: 'hi, i want to sign up'
         }, {
             email: 'customer2@gmail.com',
-            firstName: 'al',
-            lastName: 'nap',
+            firstName: 'Al',
+            lastName: 'Nap',
             subject: 'Sign up for workshop 2',
             text: 'i want to sign up'
         }]
@@ -174,8 +183,8 @@ app.get('/seed', (req, res) => {
         price4: 60,
         customers: [{
             email: 'customer1@gmail.com',
-            firstName: 'jo',
-            lastName: 'doe',
+            firstName: 'Jo',
+            lastName: 'Doe',
             subject: 'Sign up for workshop',
             text: 'hi, i want to sign up'
         }]
