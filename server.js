@@ -89,49 +89,35 @@ app.post('/contact', (req, res) => {
     })
 })
 
-app.post('/workshops', (req, res) => {
+const sendSignupEmail = (req, res) => {
+    let { email, firstName, lastName, subject, text } = req.body
+    const name = `${firstName} ${lastName}`
+    if (!text) {
+        text = `From: ${name} ${email}`
+    }
+    sendMail(email, name, subject, text, (err, data) => {
+        if (err) {
+            res.status(500).json({ success: false, message: 'Error signing up. Try again later.' }) // check for success in FE to display custom message
+        }
+        else {
+            res.json({ success: true, message: 'You signed up successfully!' })
+        }
+    })
+}
+
+app.post('/workshops', async (req, res) => { // ws sign up rename
     let { workshopId, email, firstName, lastName, subject, text } = req.body
-
-    // ADD CUSTOMER TO CUSTOMERS COLLECTION
     const customer = new Customer({ workshopId, email, firstName, lastName, subject, text })
-    // customer.save()
-    //     .then(() => res.json({ message: 'Customer saved' }))
-    //     .catch(err => res.send(err))
 
-    // ADD CUSTOMER TO WORKSHOP CUSTOMERS ARRAY
-    Workshop.findById(workshopId)
-        .then((workshop) => {
-            workshop.customers.push(customer)
-            workshop.save()
-            res.json({ message: 'customer added in ws: ' + workshop.title })
-        })
-        .catch(() => res.json({ message: 'error adding customer' }))
-    // need to catch err finding ws and err pushing customer?
-
-    // Workshop.findById(workshopId, (err, workshop) => {
-    //     if (err) {
-    //         console.log('findById err:', err)
-    //         res.json({ message: 'error finding workshop' })
-    //     } else {
-    //         console.log('found workshop:', workshop)
-    //         res.json({ message: 'found workshop' })
-    //     }
-    // })
-
-
-    // SEND EMAIL
-    // const name = `${firstName} ${lastName}`
-    // if (!text) {
-    //     text = `From: ${name} ${email}`
-    // }
-    // sendMail(email, name, subject, text, (err, data) => {
-    //     if (err) {
-    //         res.status(500).json({ message: 'Error signing up. Try again later.' })
-    //     }
-    //     else {
-    //         res.json({ message: 'You signed up successfully!' })
-    //     }
-    // })
+    try {
+        const newCustomer = await customer.save() // add customer to customers collection
+        const workshop = await Workshop.findById(workshopId)
+        workshop.customers.push(newCustomer) // add customer to ws customers array
+        await workshop.save()
+        sendSignupEmail(req, res) // res.json is called in sendSignupEmail
+    } catch (err) {
+        res.status(500).json({ message: 'Error signing up. Try again later.' }) // this catches errors with save / push customer 
+    }
 })
 
 app.get('/seed', (req, res) => {
