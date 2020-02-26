@@ -81,10 +81,10 @@ app.post('/contact', (req, res) => {
 
     sendMail(email, name, subject, text, (err, data) => {
         if (err) {
-            res.status(500).json({ message: 'Error sending message. Try again later.' })
+            res.status(500).json({ success: false, message: 'Error sending message.', err })
         }
         else {
-            res.json({ message: 'Your message has been successfully sent!' })
+            res.json({ success: true, message: 'Your message has been sent.' })
         }
     })
 })
@@ -97,10 +97,10 @@ const sendSignupEmail = (req, res) => {
     }
     sendMail(email, name, subject, text, (err, data) => {
         if (err) {
-            res.status(500).json({ success: false, message: 'Error signing up. Try again later.' }) // check for success in FE to display custom message
+            res.status(500).json({ success: false, message: 'Error signing up.', err }) // check for success in FE to display custom message
         }
         else {
-            res.json({ success: true, message: 'You signed up successfully!' })
+            res.json({ success: true, message: 'You signed up' })
         }
     })
 }
@@ -116,7 +116,8 @@ app.post('/workshops', async (req, res) => { // ws sign up rename
         await workshop.save()
         sendSignupEmail(req, res) // res.json is called in sendSignupEmail
     } catch (err) {
-        res.status(500).json({ message: 'Error signing up. Try again later.' }) // this catches errors with save / push customer 
+        console.log(err)
+        res.status(500).json({ success: false, message: 'Error during save / push customer', err }) // this catches errors with save / push customer 
     }
 })
 
@@ -276,6 +277,20 @@ app.delete("/admin/workshop/:id", async (req, res) => {
     try {
         await Workshop.findOneAndDelete({ secondaryID: id })
         res.send({})
+    } catch (err) {
+        res.send(err)
+    }
+})
+
+app.put("/admin/workshop/:id", async (req, res) => {
+    const id = req.params.id
+    console.log(req.body)
+    // let name = req.body.name // => comes from browser fetch() => body: JSON.stringify({name: "Rob"})
+
+    try {
+        const workshopToUpdate = await Workshop.findOneAndUpdate({ secondaryID: id }, req.body)
+        console.log('workshopToUpdate:', workshopToUpdate)
+        res.send({ success: true })
     } catch (err) {
         res.send(err)
     }
