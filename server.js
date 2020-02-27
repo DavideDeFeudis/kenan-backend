@@ -73,7 +73,7 @@ app.use((req, res, next) => {
 })
 
 app.get('/ping', (req, res) => {
-    res.json({ message: 'version 1' })
+    res.json({ message: 'version 2' })
 })
 
 app.post('/contact', (req, res) => {
