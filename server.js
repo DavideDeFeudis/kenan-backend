@@ -89,22 +89,6 @@ app.post('/contact', (req, res) => {
     })
 })
 
-const sendSignupEmail = (req, res) => {
-    let { email, firstName, lastName, subject, text } = req.body
-    const name = `${firstName} ${lastName}`
-    if (!text) {
-        text = `From: ${name} ${email}`
-    }
-    sendMail(email, name, subject, text, (err, data) => {
-        if (err) {
-            res.status(500).json({ success: false, message: 'Error signing up.', err }) // check for success in FE to display custom message
-        }
-        else {
-            res.json({ success: true, message: 'You signed up' })
-        }
-    })
-}
-
 app.post('/workshops', async (req, res) => { // ws sign up rename
     let { workshopId, email, firstName, lastName, subject, text } = req.body
     const customer = new Customer({ workshopId, email, firstName, lastName, subject, text })
@@ -114,10 +98,10 @@ app.post('/workshops', async (req, res) => { // ws sign up rename
         const workshop = await Workshop.findById(workshopId)
         workshop.customers.push(newCustomer) // add customer to ws customers array
         await workshop.save()
-        sendSignupEmail(req, res) // res.json is called in sendSignupEmail
+        res.json({ success: true, message: 'You signed up' })
     } catch (err) {
         console.log(err)
-        res.status(500).json({ success: false, message: 'Error during save / push customer', err }) // this catches errors with save / push customer 
+        res.status(500).json({ success: false, message: 'Error during save / push customer', err })
     }
 })
 
