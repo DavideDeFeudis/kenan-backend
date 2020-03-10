@@ -39,8 +39,11 @@ const Customer = mongoose.model('Customer', CustomerSchema);
 const WorkshopSchema = new mongoose.Schema({
     secondaryID: { type: String, required: true },
     title: { type: String, required: true },
-    date: { type: String, required: true },
-    address: { type: String, required: true },
+    startDate: { type: String, required: true },
+    startTime: { type: String },
+    endDate: { type: String, required: true },
+    endTime: { type: String },
+    address: { type: String },
     info: { type: String },
     priceLabel1: { type: String, required: true },
     priceLabel2: String,
@@ -109,13 +112,12 @@ app.get('/seed', (req, res) => {
     const workshop1 = new Workshop({
         secondaryID: 'afhrh44389rfhjrke43',
         title: 'Flow Acrobatics Dresden',
-        date: '11-12.04.2020 11:00-15:00',
+        startDate: '2020-05-20',
+        startTime: '11:00',
+        endDate: '2020-05-21',
+        endTime: '12:30',
         address: 'Dresdener Str. 24, 10445 Dresden',
         info: 'For professional dancers',
-        // priceLabel1: 'Early bird until 04.04.2020: two days €',
-        // priceLabel2: '/ one day: €',
-        // priceLabel3: 'Normal price: two days €',
-        // priceLabel4: '/ one day: €',
         priceLabel1: 'Until 04.04.2020 two days €',
         priceLabel2: 'Until 04.04.2020 one day €',
         priceLabel3: 'Normal price two days €',
@@ -141,7 +143,10 @@ app.get('/seed', (req, res) => {
     const workshop2 = new Workshop({
         secondaryID: 'srt4565rgkjhw45kjh',
         title: 'Flow Acrobatics Hamburg',
-        date: '11-12.05.2020 11:00-15:00',
+        startDate: '2020-04-20',
+        startTime: '11:00',
+        endDate: '2020-04-21',
+        endTime: '12:30',
         address: 'Hamburger Str. 24, 53465 Hamburg',
         info: 'For professional dancers and acrobats',
         priceLabel1: 'Until 04.04.2020 two days €',
@@ -160,24 +165,8 @@ app.get('/seed', (req, res) => {
             text: 'hi, i want to sign up'
         }]
     })
-    const workshop3 = new Workshop({
-        secondaryID: 'sfgkjsrtgkjkj5439fdf',
-        title: 'Flow Acrobatics Barcelona',
-        date: '11-12.06.2020 11:00-15:00',
-        address: 'Calle Barcelona 24, 54325 Barcelona',
-        info: 'For acrobats',
-        priceLabel1: 'Until 04.04.2020 two days €',
-        priceLabel2: 'Until 04.04.2020 one day €',
-        priceLabel3: 'Normal price two days €',
-        priceLabel4: 'Normal price one day €',
-        price1: 70,
-        price2: 40,
-        price3: 90,
-        price4: 50,
-        customers: []
-    })
-    Workshop.insertMany([workshop1, workshop2, workshop3])
-        .then(() => res.send([workshop1, workshop2, workshop3]))
+    Workshop.insertMany([workshop1, workshop2])
+        .then(() => res.send([workshop1, workshop2]))
         .catch(err => res.send(err))
 })
 
@@ -225,7 +214,10 @@ app.post('/admin/workshop', (req, res) => { // create ws
     const {
         secondaryID,
         title,
-        date,
+        startDate,
+        startTime,
+        endDate,
+        endTime,
         address,
         info,
         priceLabel1,
@@ -239,7 +231,10 @@ app.post('/admin/workshop', (req, res) => { // create ws
     const workshop = new Workshop({
         secondaryID,
         title,
-        date,
+        startDate,
+        startTime,
+        endDate,
+        endTime,
         address,
         info,
         priceLabel1,
