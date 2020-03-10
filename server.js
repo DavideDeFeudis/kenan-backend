@@ -221,7 +221,7 @@ app.get('/customers', (req, res) => {
     // })
 })
 
-app.post('/admin/workshop', (req, res) => {
+app.post('/admin/workshop', (req, res) => { // create ws
     const {
         secondaryID,
         title,
@@ -252,8 +252,14 @@ app.post('/admin/workshop', (req, res) => {
         price4
     })
     workshop.save()
-        .then(() => res.json({ message: 'Workshop saved' }))
-        .catch(err => res.send(err))
+        .then(() => {
+            console.log('Workshop created')
+            res.json({ message: 'Workshop created' })
+        })
+        .catch(err => {
+            console.log('Create workshop failed - err:', err)
+            res.send(err)
+        })
 })
 
 app.delete("/admin/workshop/:id", async (req, res) => {
