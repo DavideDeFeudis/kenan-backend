@@ -15,13 +15,6 @@
             ]
         },
         {
-            "src": "/workshops",
-            "dest": "/server.js",
-            "methods": [
-                "GET"
-            ]
-        },
-        {
             "src": "/contact",
             "dest": "/server.js",
             "methods": [
@@ -29,10 +22,59 @@
             ]
         },
         {
-            "src": "/workshops",
+            "src": "/signup",
             "dest": "/server.js",
             "methods": [
                 "POST"
+            ]
+        },
+        {
+            "src": "/seed",
+            "dest": "/server.js",
+            "methods": [
+                "GET"
+            ]
+        },
+        {
+            "src": "/drop",
+            "dest": "/server.js",
+            "methods": [
+                "GET"
+            ]
+        },
+        {
+            "src": "/workshops",
+            "dest": "/server.js",
+            "methods": [
+                "GET"
+            ]
+        },
+        {
+            "src": "/customers",
+            "dest": "/server.js",
+            "methods": [
+                "GET"
+            ]
+        },
+        {
+            "src": "/admin/workshop",
+            "dest": "/server.js",
+            "methods": [
+                "POST"
+            ]
+        },
+        {
+            "src": "/admin/workshop",
+            "dest": "/server.js",
+            "methods": [
+                "DELETE"
+            ]
+        },
+        {
+            "src": "/admin/workshop",
+            "dest": "/server.js",
+            "methods": [
+                "PUT"
             ]
         }
     ],
