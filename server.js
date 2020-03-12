@@ -92,7 +92,7 @@ app.post('/contact', (req, res) => {
     })
 })
 
-app.post('/workshops', async (req, res) => { // ws sign up rename
+app.post('/signup', async (req, res) => {
     let { workshopId, email, firstName, lastName, subject, text } = req.body
     const customer = new Customer({ workshopId, email, firstName, lastName, subject, text })
 

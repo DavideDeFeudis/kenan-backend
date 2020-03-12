@@ -1,14 +1,46 @@
 {
     "version": 2,
     "builds": [
-        { "src": "server.js", "use": "@now/node-server" }
+        {
+            "src": "server.js",
+            "use": "@now/node-server"
+        }
     ],
     "routes": [
         {
-          "src": "/ping",
-          "dest": "server.js",
-          "methods": ["GET"]
+            "src": "/ping",
+            "dest": "/server.js",
+            "methods": [
+                "GET"
+            ]
+        },
+        {
+            "src": "/workshops",
+            "dest": "/server.js",
+            "methods": [
+                "GET"
+            ]
+        },
+        {
+            "src": "/contact",
+            "dest": "/server.js",
+            "methods": [
+                "POST"
+            ]
+        },
+        {
+            "src": "/workshops",
+            "dest": "/server.js",
+            "methods": [
+                "POST"
+            ]
         }
-    ]
- }
- 
+    ],
+    "env": {
+        "API_KEY": "@api_key",
+        "DOMAIN": "@domain",
+        "RECEIVER": "@receiver",
+        "CORS_ORIGIN": "@cors_origin",
+        "MONGO": "@mongo"
+    }
+}
