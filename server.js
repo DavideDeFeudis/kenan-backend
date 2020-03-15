@@ -69,6 +69,7 @@ const Workshop = mongoose.model('Workshop', WorkshopSchema);
 app.use(express.json())
 
 app.use((req, res, next) => {
+    // res.set('ACCESS-CONTROL-ALLOW-ORIGIN', '*')
     res.set('ACCESS-CONTROL-ALLOW-ORIGIN', process.env.CORS_ORIGIN)
     res.set('ACCESS-CONTROL-ALLOW-HEADERS', '*')
     res.set('ACCESS-CONTROL-ALLOW-METHODS', 'GET, POST, PATCH, DELETE')
@@ -76,17 +77,20 @@ app.use((req, res, next) => {
 })
 
 app.get('/ping', (req, res) => {
-    res.json({ message: 'version 2' })
+    res.json({ message: 'version 3' })
 })
 
 app.post('/contact', (req, res) => {
     const { email, name, subject, text } = req.body
+    console.log('req.body', req.body)
 
     sendMail(email, name, subject, text, (err, data) => {
         if (err) {
+            console.log('Error sending message', err)
             res.status(500).json({ success: false, message: 'Error sending message.', err })
         }
         else {
+            console.log('Message sent')
             res.json({ success: true, message: 'Your message has been sent.' })
         }
     })
@@ -94,7 +98,7 @@ app.post('/contact', (req, res) => {
 
 app.post('/signup', async (req, res) => {
     let { workshopId, email, firstName, lastName, subject, text } = req.body
-    const customer = new Customer({ workshopId, email, firstName, lastName, subject, text })
+    const customer = new Customer({ workshopId, email, firstName, lastName, subject, text }) // replace with req.body
 
     try {
         const newCustomer = await customer.save() // add customer to customers collection
