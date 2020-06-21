@@ -262,6 +262,7 @@ app.post("/admin/workshop", (req, res) => {
     price3,
     price4,
   } = req.body;
+
   const workshop = new Workshop({
     secondaryID,
     title,
@@ -280,11 +281,12 @@ app.post("/admin/workshop", (req, res) => {
     price3,
     price4,
   });
+
   workshop
     .save()
-    .then(() => {
+    .then((workshop) => {
       console.log("Workshop created");
-      res.json({ message: "Workshop created" });
+      res.json(workshop);
     })
     .catch((err) => {
       console.log("Create workshop failed - err:", err);
