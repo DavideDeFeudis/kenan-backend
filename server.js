@@ -41,7 +41,6 @@ const CustomerSchema = new mongoose.Schema({
 const Customer = mongoose.model("Customer", CustomerSchema);
 
 const WorkshopSchema = new mongoose.Schema({
-  secondaryID: { type: String, required: true },
   title: { type: String, required: true },
   startDate: { type: String, required: true },
   startTime: { type: String },
@@ -136,7 +135,6 @@ app.post("/signup", async (req, res) => {
 
 app.get("/seed", (req, res) => {
   const workshop1 = new Workshop({
-    secondaryID: "afhrh44389rfhjrke43",
     title: "Flow Acrobatics Dresden",
     startDate: "2020-05-20",
     startTime: "11:00",
@@ -170,7 +168,6 @@ app.get("/seed", (req, res) => {
     ],
   });
   const workshop2 = new Workshop({
-    secondaryID: "srt4565rgkjhw45kjh",
     title: "Flow Acrobatics Hamburg",
     startDate: "2020-04-20",
     startTime: "11:00",
@@ -243,43 +240,8 @@ app.get("/customers", (req, res) => {
 });
 
 app.post("/admin/workshop", (req, res) => {
-  // create ws
-  const {
-    secondaryID,
-    title,
-    startDate,
-    startTime,
-    endDate,
-    endTime,
-    address,
-    info,
-    priceLabel1,
-    priceLabel2,
-    priceLabel3,
-    priceLabel4,
-    price1,
-    price2,
-    price3,
-    price4,
-  } = req.body;
-
   const workshop = new Workshop({
-    secondaryID,
-    title,
-    startDate,
-    startTime,
-    endDate,
-    endTime,
-    address,
-    info,
-    priceLabel1,
-    priceLabel2,
-    priceLabel3,
-    priceLabel4,
-    price1,
-    price2,
-    price3,
-    price4,
+    ...req.body,
   });
 
   workshop
@@ -297,7 +259,7 @@ app.post("/admin/workshop", (req, res) => {
 app.delete("/admin/workshop/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    await Workshop.findOneAndDelete({ secondaryID: id });
+    await Workshop.findOneAndDelete({ _id: id });
     res.send({});
   } catch (err) {
     res.send(err);
@@ -311,7 +273,7 @@ app.put("/admin/workshop/:id", async (req, res) => {
 
   try {
     const workshopToUpdate = await Workshop.findOneAndUpdate(
-      { secondaryID: id },
+      { _id: id },
       req.body
     );
     console.log("workshopToUpdate:", workshopToUpdate);
