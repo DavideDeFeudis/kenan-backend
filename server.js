@@ -31,11 +31,6 @@ const CustomerSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   subject: { type: String, required: true },
   text: { type: String, required: false },
-  // messages: [{ subject: String, text: String }],
-  // workshops: [{
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'Workshop'
-  // }]
 });
 
 const Customer = mongoose.model("Customer", CustomerSchema);
@@ -61,10 +56,6 @@ const WorkshopSchema = new mongoose.Schema({
   price5: Number,
   price6: Number,
   customers: [CustomerSchema],
-  // customers: [{
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'Customer'
-  // }]
 });
 
 const Workshop = mongoose.model("Workshop", WorkshopSchema);
@@ -72,7 +63,6 @@ const Workshop = mongoose.model("Workshop", WorkshopSchema);
 app.use(express.json());
 
 app.use((req, res, next) => {
-  // res.set('ACCESS-CONTROL-ALLOW-ORIGIN', '*')
   res.set("ACCESS-CONTROL-ALLOW-ORIGIN", process.env.CORS_ORIGIN);
   res.set("ACCESS-CONTROL-ALLOW-HEADERS", "*");
   res.set("ACCESS-CONTROL-ALLOW-METHODS", "GET, POST, PATCH, DELETE");
@@ -85,7 +75,6 @@ app.get("/ping", (req, res) => {
 
 app.post("/contact", (req, res) => {
   const { email, name, subject, text } = req.body;
-  // console.log('req.body', req.body)
 
   sendMail(email, name, subject, text, (err, data) => {
     if (err) {
@@ -101,8 +90,6 @@ app.post("/contact", (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  // console.log('signup req.body', req.body)
-
   let { email, firstName, lastName, subject, text } = req.body;
   const name = firstName + lastName;
 
@@ -117,20 +104,6 @@ app.post("/signup", async (req, res) => {
       res.json({ success: true, message: "Your message has been sent." });
     }
   });
-
-  // let { workshopId, email, firstName, lastName, subject, text } = req.body
-  // const customer = new Customer({ workshopId, email, firstName, lastName, subject, text }) // replace with req.body
-
-  // try {
-  //     const newCustomer = await customer.save() // add customer to customers collection
-  //     const workshop = await Workshop.findById(workshopId)
-  //     workshop.customers.push(newCustomer) // add customer to ws customers array
-  //     await workshop.save()
-  //     res.json({ success: true, message: 'You signed up' })
-  // } catch (err) {
-  //     console.log(err)
-  //     res.status(500).json({ success: false, message: 'Error during save / push customer', err })
-  // }
 });
 
 app.get("/seed", (req, res) => {
@@ -211,15 +184,6 @@ app.get("/workshops", (req, res) => {
     .catch((err) => {
       res.send(err);
     });
-  // Workshop.find((err, workshops) => {
-  //     if (err) {
-  //         console.log(err)
-  //         res.send(err)
-  //     } else {
-  //         mongoose.connection.close();
-  //         res.send(workshops)
-  //     }
-  // })
 });
 
 app.get("/customers", (req, res) => {
@@ -228,15 +192,6 @@ app.get("/customers", (req, res) => {
     .catch((err) => {
       res.send(err);
     });
-  // Workshop.find((err, workshops) => {
-  //     if (err) {
-  //         console.log(err)
-  //         res.send(err)
-  //     } else {
-  //         mongoose.connection.close();
-  //         res.send(workshops)
-  //     }
-  // })
 });
 
 app.post("/admin/workshop", (req, res) => {
@@ -268,15 +223,12 @@ app.delete("/admin/workshop/:id", async (req, res) => {
 
 app.put("/admin/workshop/:id", async (req, res) => {
   const id = req.params.id;
-  console.log(req.body);
-  // let name = req.body.name // => comes from browser fetch() => body: JSON.stringify({name: "Rob"})
 
   try {
     const workshopToUpdate = await Workshop.findOneAndUpdate(
       { _id: id },
       req.body
     );
-    console.log("workshopToUpdate:", workshopToUpdate);
     res.send({ success: true });
   } catch (err) {
     res.send(err);
