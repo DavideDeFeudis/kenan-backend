@@ -1,3 +1,5 @@
+![](https://github.com/DavideDeFeudis/kenan/blob/master/src/images/about_1920.jpg)
+
 <h1 align="center">Kenan Dinkelmann Dance</h1>
 
 ## Basic Overview
